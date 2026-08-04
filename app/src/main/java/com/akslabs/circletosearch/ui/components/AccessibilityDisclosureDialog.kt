@@ -35,7 +35,7 @@ fun AccessibilityDisclosureDialog(
         text = {
             Column {
                 Text(
-                    text = "This permission is needed to capture the screen and detect the double tap gesture to trigger Circle to Search or other actions. If the app is used as your default assistant, this permission is optional.",
+                    text = "This permission is needed to capture the screen to trigger Circle to Search or other actions. If the app is used as your default assistant, this permission is optional.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

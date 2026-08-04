@@ -4,34 +4,19 @@
   <h1>Circle To Search</h1>
   <h3>Circle To Search: Multi-Engine Reverse Image Search</h3>
   <p>🔒 <em>Google • Bing • Yandex • Tineye</em></p>
+</div>
+
+> 🍴 **This is a fork of [AKS-Labs/CircleToSearch](https://github.com/AKS-Labs/CircleToSearch)**
+> All credit for the original app, design, and core functionality goes to [AKS-Labs](https://github.com/akslabs). This fork adds a few extra features for personal use:
+> - 📷 **Camera QR Code Scanning**
+> - 💱 **Currency Converter**
+>
+> The original donate UI was removed from the in-app interface for this fork — if you'd like to support the original developers, see the [Community](#-community) section below.
 
 <!-- ---------- Badges ---------- -->
-  <div align="center">
-    <!-- <img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square"> -->
-    <!-- <img alt="Downloads" src="https://img.shields.io/github/downloads/AKS-Labs/CircleToSearch/total?color=c3e7ff&style=flat-square"> -->
-    <img alt="Last commit" src="https://img.shields.io/github/last-commit/AKS-Labs/CircleToSearch?color=c3e7ff&style=flat-square">
-    <img alt="Repo size" src="https://img.shields.io/github/repo-size/AKS-Labs/CircleToSearch?color=c3e7ff&style=flat-square">
-    <!-- <img alt="Stars" src="https://img.shields.io/github/stars/AKS-Labs/CircleToSearch?color=c3e7ff&style=flat-square"> -->
-    <br>
-
-
-
-
-  <img src="https://hits.sh/github.com/AKS-Labs/CircleToSearch.svg?style=for-the-badge&label=Page%20Views&extraCount=360&color=ff3f6f&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJzdmctaWNvbiIgc3R5bGU9IndpZHRoOiAxZW07IGhlaWdodDogMWVtO3ZlcnRpY2FsLWFsaWduOiBtaWRkbGU7ZmlsbDojZmZmZmZmO292ZXJmbG93OiBoaWRkZW47IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB2ZXJzaW9uPSIxLjEiPjxwYXRoIGQ9Ik01MTIgMzg0YTEyOCAxMjggMCAwIDAtMTI4IDEyOCAxMjggMTI4IDAgMCAwIDEyOCAxMjggMTI4IDEyOCAwIDAgMCAxMjgtMTI4IDEyOCAxMjggMCAwIDAtMTI4LTEyOG0wIDM0MS4zMzMzMzNhMjEzLjMzMzMzMyAyMTMuMzMzMzMzIDAgMCAxLTIxMy4zMzMzMzMtMjEzLjMzMzMzMyAyMTMuMzMzMzMzIDIxMy4zMzMzMzMgMCAwIDEgMjEzLjMzMzMzMy0yMTMuMzMzMzMzIDIxMy4zMzMzMzMgMjEzLjMzMzMzMyAwIDAgMSAyMTMuMzMzMzMzIDIxMy4zMzMzMzMgMjEzLjMzMzMzMyAyMTMuMzMzMzMzIDAgMCAxLTIxMy4zMzMzMzMgMjEzLjMzMzMzM20wLTUzMy4zMzMzMzNDMjk4LjY2NjY2NyAxOTIgMTE2LjQ4IDMyNC42OTMzMzMgNDIuNjY2NjY3IDUxMmM3My44MTMzMzMgMTg3LjMwNjY2NyAyNTYgMzIwIDQ2OS4zMzMzMzMgMzIwczM5NS41Mi0xMzIuNjkzMzMzIDQ2OS4zMzMzMzMtMzIwYy03My44MTMzMzMtMTg3LjMwNjY2Ny0yNTYtMzIwLTQ2OS4zMzMzMzMtMzIweiIgZmlsbD0iIi8%2BPC9zdmc%2B&labelColor=870b2a"/>
-
-
-
-<a href="https://github.com/AKS-Labs/CircleToSearch/releases">
-
-  <img src="https://img.shields.io/github/downloads/AKS-Labs/CircleToSearch/total?color=ff9500&style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHRpdGxlPmRvd25sb2FkPC90aXRsZT48cGF0aCBkPSJNNSwyMEgxOVYxOEg1TTE5LDlIMTVWM0g5VjlINUwxMiwxNkwxOSw5WiIgZmlsbD0id2hpdGUiIC8+PC9zdmc+&labelColor=a6660d"/>
-
-</a>
-
-<a href="https://github.com/AKS-Labs/CircleToSearch/stargazers">
-
-  <img src="https://img.shields.io/github/stars/AKS-Labs/CircleToSearch?color=ffff00&style=for-the-badge&labelColor=a1a116&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHRpdGxlPnN0YXI8L3RpdGxlPjxwYXRoIGQ9Ik0xMiwxNy4yN0wxOC4xOCwyMUwxNi41NCwxMy45N0wyMiw5LjI0TDE0LjgxLDguNjJMMTIsMkw5LjE5LDguNjJMMiw5LjI0TDcuNDUsMTMuOTdMNS44MiwyMUwxMiwxNy4yN1oiIGZpbGw9IndoaXRlIiAvPjwvc3ZnPg=="/>
-
-</a>
+<div align="center">
+  <img alt="Last commit" src="https://img.shields.io/github/last-commit/haiderakt/CircleToSearch?color=c3e7ff&style=flat-square">
+  <img alt="Repo size" src="https://img.shields.io/github/repo-size/haiderakt/CircleToSearch?color=c3e7ff&style=flat-square">
 </div>
 
 <!-- ----------   Labels ---------- -->
@@ -41,12 +26,11 @@
   <img alt="Jetpack Compose" src="https://img.shields.io/static/v1?style=for-the-badge&message=Jetpack+Compose&color=4285F4&logo=Jetpack+Compose&logoColor=FFFFFF&label="/>
   <img alt="material" src="https://custom-icon-badges.demolab.com/badge/material%20you-lightblue?style=for-the-badge&logocolor=333&logo=material-you"/>
 </div>
-</div>
 
 ---
-## 🎯 What is Circle To Search?
+##  What is Lens?
 
-Ever wanted to search for something you see on your phone screen? **Circle To Search** brings that power to your fingertips on *any* Android device. Simply draw a circle around what you're looking for, and instantly get results from your favorite search engine.
+Ever wanted to search for something you see on your phone screen? **Lens** brings that power to your fingertips on *any* Android device. Simply draw a circle around what you're looking for, and instantly get results from your favorite search engine.
 
 Think of it as having Google Lens, Bing Visual Search, Yandex, and TinEye all in one place—and it works everywhere.
 
@@ -95,11 +79,23 @@ Think of it as having Google Lens, Bing Visual Search, Yandex, and TinEye all in
 - **Fast Sharing**: Instantly copy URLs of search results.
 - **Open In Browser**: Bounce directly from the internal in-app viewer to your favorite external browser in one tap.
 
+### 🆕 Fork Additions
+- **Camera QR Code Scanning**: Scan QR codes directly using your device camera.
+- **Currency Converter**: Built-in on-the-fly currency conversion tool.
+
 ---
 
-
-
 ## 📥 **Get Circle To Search**
+
+This fork is not published on the Play Store or F-Droid. To use it, build it from source:
+
+```bash
+git clone https://github.com/haiderakt/Lens.git
+cd Lens
+./gradlew assembleDebug
+```
+
+If you're looking for the original, officially published app, get it here instead:
 
 <div align="center">
     <p align="center">
@@ -116,13 +112,11 @@ Think of it as having Google Lens, Bing Visual Search, Yandex, and TinEye all in
          src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'
          height="80" />
   </a>
-  
   <br>
   <p><strong>• 🔓 Open Source    • 🚀 Ready to Use</strong></p>
 </div>
 
 ---
-
 
 ## 📱 **Screenshots**
 
@@ -145,16 +139,18 @@ Think of it as having Google Lens, Bing Visual Search, Yandex, and TinEye all in
 
 ## 🤝 **Community**
 
-- 🐛 **Bug reports:** [GitHub Issues](https://github.com/AKS-Labs/CircleToSearch/issues)
-- 💡 **Feature requests:** [GitHub Issues](https://github.com/AKS-Labs/CircleToSearch/issues)
-- 👨‍💻 **Contribute:** Fork and submit pull requests
-- ⭐ Star the repo
-* 💬 Join the [AKS-Labs Telegram group](https://t.me/AKSLabs)
-* ☕ Maybe [**Donate**](https://github.com/sponsors/AKS-Labs), if you can.
+**For this fork:**
+- 🐛 **Bug reports / feature requests:** [Open an issue on this fork](https://github.com/haiderakt/Lens/issues)
 
+**For the original project (AKS-Labs):**
+- 👨‍💻 **Contribute to upstream:** [AKS-Labs/CircleToSearch](https://github.com/AKS-Labs/CircleToSearch)
+- ⭐ Star the [original repo](https://github.com/AKS-Labs/CircleToSearch)
+- 💬 Join the [AKS-Labs Telegram group](https://t.me/AKSLabs)
+- ☕ [**Donate to the original developers**](https://github.com/sponsors/AKS-Labs) — all core app credit belongs to them.
 
 ---
 
 <p align="center">
-  Made with ❤️ by <a href="https://github.com/akslabs">AKSLabs</a>
+  Original app made with ❤️ by <a href="https://github.com/akslabs">AKSLabs</a><br>
+  Fork maintained by <a href="https://github.com/haiderakt">Haider Ali</a>
 </p>

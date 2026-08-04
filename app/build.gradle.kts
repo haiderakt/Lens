@@ -29,6 +29,9 @@ android {
         version = release(36)
     }
 
+    base {
+        archivesName.set("Lens")
+    }
 
     defaultConfig {
         applicationId = "com.akslabs.circletosearch"
@@ -48,6 +51,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -131,4 +135,10 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.github.adaptech-cz.Tesseract4Android:tesseract4android:4.7.0")
     implementation("com.google.zxing:core:3.5.4")
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 }

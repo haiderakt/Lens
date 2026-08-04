@@ -75,6 +75,7 @@ import androidx.compose.material.icons.filled.BorderOuter
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.DesktopWindows
 import androidx.compose.material.icons.filled.Favorite
@@ -95,6 +96,7 @@ import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Email
@@ -152,6 +154,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.webkit.WebSettingsCompat
+import kotlin.math.min
 import com.akslabs.circletosearch.data.SearchEngine
 import com.akslabs.circletosearch.ui.components.FriendlyMessageBubble
 import com.akslabs.circletosearch.ui.components.searchWithGoogleLens
@@ -162,26 +165,19 @@ import com.akslabs.circletosearch.utils.ImageUtils
 import com.akslabs.circletosearch.utils.QrResult
 import com.akslabs.circletosearch.utils.QrResultWithBounds
 import com.akslabs.circletosearch.utils.QrScanner
-import com.akslabs.circletosearch.ui.qrResultShortLabel
 import com.akslabs.circletosearch.utils.UIPreferences
-import com.akslabs.circletosearch.ui.components.MoreAppsBottomSheet
-import com.akslabs.circletosearch.ui.components.DonateBottomSheet
-import android.net.Uri
-import kotlinx.coroutines.delay
+import com.akslabs.circletosearch.utils.CurrencyConverter
+import com.akslabs.circletosearch.utils.TextDetectionHelper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
-import androidx.webkit.WebViewFeature
-import com.akslabs.circletosearch.data.isDirectUpload
-import kotlin.math.max
-import kotlin.math.min
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import android.os.Build
-import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material3.Surface
+import com.akslabs.circletosearch.ui.components.CameraQrScannerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -197,7 +193,7 @@ fun CircleToSearchScreen(
     val scope = rememberCoroutineScope()
     
     // Initialize preferences
-    val uiPreferences = remember { UIPreferences(context) }
+    val uiPreferences = remember<UIPreferences> { UIPreferences(context) }
     
     // Reactive search method state — observed via flow so it is always in sync
     // with whatever set it (home screen, settings sheet, or accessibility actions).
@@ -210,9 +206,8 @@ fun CircleToSearchScreen(
     val effectiveLensOnly = searchModeOverride ?: isGoogleLensOnly
     
     
-    // New Sheet States
-    var showMoreAppsSheet by remember { mutableStateOf(false) }
-    var showDonateSheet by remember { mutableStateOf(false) }
+    // Sheet States
+    var showCameraQrScanner by remember { mutableStateOf(false) }
 
     // Material You logic for colors
     val isDark = isSystemInDarkTheme()
@@ -278,6 +273,11 @@ fun CircleToSearchScreen(
     var isEntityExtractMode by remember { mutableStateOf(false) }
     var detectedEntities by remember { mutableStateOf<List<SmartEntity>>(emptyList()) }
     var isExtractingEntities by remember { mutableStateOf(false) }
+    
+    // Currency Conversion Mode
+    var isCurrencyMode by remember { mutableStateOf(false) }
+    var currencyNodes by remember { mutableStateOf<List<CurrencyNode>>(emptyList()) }
+    var isConverting by remember { mutableStateOf(false) }
     
     LaunchedEffect(Unit) {
         if (uiPreferences.isShowFriendlyMessages()) {
@@ -1482,24 +1482,52 @@ fun CircleToSearchScreen(
                                 Icon(Icons.Default.MusicNote, contentDescription = "Assist Copy", tint = if (isAssistDataReady) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
                             }
 
-                            // Circular Button: Translate
+                            // Circular Button: Currency Converter
                             IconButton(
                                 onClick = {
                                     haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                    android.widget.Toast.makeText(context, "Coming soon", android.widget.Toast.LENGTH_SHORT).show()
-                                    /*
-                                    try {
-                                        val intent = context.packageManager.getLaunchIntentForPackage("com.google.android.apps.translate")?.apply { addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK) }
-                                        if (intent != null) context.startActivity(intent)
-                                        else context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://translate.google.com")).apply { addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK) })
-                                    } catch (e: Exception) {}
-                                    */
+                                    isCurrencyMode = true
+                                    if (currencyNodes.isEmpty() && !isConverting) {
+                                        isConverting = true
+                                        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                            val bmp = screenshot ?: return@launch
+                                            
+                                            // Use ML Kit for more accurate instant text recognition
+                                            val textNodes = TextDetectionHelper.detectText(bmp)
+                                            android.util.Log.d("CircleToSearch", "OCR Found ${textNodes.size} blocks")
+                                            val nodes = mutableListOf<CurrencyNode>()
+                                            
+                                            try {
+                                                textNodes.forEach { node ->
+                                                    val original = node.fullText.trim()
+                                                    
+                                                    // Check for Currency (PKR)
+                                                    val converted = CurrencyConverter.convertToPkr(original)
+                                                    
+                                                    if (converted != null) {
+                                                        nodes.add(CurrencyNode(original, converted, node.bounds))
+                                                    }
+                                                }
+                                            } catch (e: Exception) {
+                                                android.util.Log.e("CircleToSearch", "Convert process error", e)
+                                            }
+                                            
+                                            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                currencyNodes = nodes
+                                                isConverting = false
+                                                if (nodes.isEmpty()) {
+                                                    android.widget.Toast.makeText(context, "No currencies to convert found.", android.widget.Toast.LENGTH_SHORT).show()
+                                                    isCurrencyMode = false
+                                                }
+                                            }
+                                        }
+                                    }
                                 },
                                 modifier = Modifier
                                     .size(60.dp)
-                                    .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape),
+                                    .background(if (isCurrencyMode) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer, CircleShape),
                             ) {
-                                Icon(Icons.Default.Translate, contentDescription = "Translate")
+                                Icon(Icons.Default.CurrencyExchange, contentDescription = "Convert to PKR", tint = if (isCurrencyMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
                             }
                         }
 
@@ -1553,11 +1581,6 @@ fun CircleToSearchScreen(
                                         )
                                     }
                                 }
-                            }
-
-                            // More Apps
-                            BottomBarButton("More Apps", { Icon(Icons.Default.Apps, null) }) {
-                                showMoreAppsSheet = true
                             }
 
                             // Pin
@@ -1621,11 +1644,6 @@ fun CircleToSearchScreen(
                                 }
                             }
 
-                            // Donate
-                            BottomBarButton("Donate", { Icon(painterResource(id = com.akslabs.circletosearch.R.drawable.donation), null, modifier = Modifier.size(22.dp)) }) {
-                                showDonateSheet = true
-                            }
-
                             // Copy Text
                             BottomBarButton("Copy Text", { Icon(painterResource(id = com.akslabs.circletosearch.R.drawable.ocr), null, modifier = Modifier.size(20.dp)) }) {
                                 copyTextManager?.setOcrOnlyMode()
@@ -1637,6 +1655,11 @@ fun CircleToSearchScreen(
                             BottomBarButton("Scan QR", { Icon(Icons.Default.QrCode, null) }) {
                                 qrScanBitmap = selectedBitmap ?: screenshot
                                 showQrSheet = true
+                            }
+
+                            // Live Camera QR Scan
+                            BottomBarButton("Camera Scan", { Icon(Icons.Default.PhotoCamera, null) }) {
+                                showCameraQrScanner = true
                             }
 
                             // Fullscreen
@@ -2021,27 +2044,9 @@ fun CircleToSearchScreen(
             }
         }
 
-        if (showMoreAppsSheet) {
-            MoreAppsBottomSheet(
-                onDismiss = { showMoreAppsSheet = false },
-                onAppSelected = { url ->
-                    try {
-                        context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse(url)).apply { addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK) })
-                    } catch (e: Exception) {}
-                    showMoreAppsSheet = false
-                }
-            )
-        }
-
-        if (showDonateSheet) {
-            DonateBottomSheet(
-                onDismiss = { showDonateSheet = false },
-                onDonateOptionSelected = { url ->
-                    try {
-                        context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse(url)).apply { addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK) })
-                    } catch (e: Exception) {}
-                    showDonateSheet = false
-                }
+        if (showCameraQrScanner) {
+            CameraQrScannerDialog(
+                onDismiss = { showCameraQrScanner = false }
             )
         }
 
@@ -2051,10 +2056,73 @@ fun CircleToSearchScreen(
                 onDismissRequest = { showSettingsScreen = false }
             )
         }
+
+        // --- Currency Converter Overlay ---
+        if (isCurrencyMode && screenshot != null && !isCopyMode) {
+            BoxWithConstraints(modifier = Modifier.fillMaxSize().zIndex(2700f)) {
+                val screenWidth = maxWidth
+                val screenHeight = maxHeight
+                val bitmapWidth = screenshot.width.toFloat()
+                val bitmapHeight = screenshot.height.toFloat()
+
+                // Exit tap capture
+                Box(modifier = Modifier.fillMaxSize().pointerInput(Unit) {
+                    detectTapGestures { isCurrencyMode = false }
+                })
+
+                if (isConverting) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            androidx.compose.material3.CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                            Spacer(Modifier.height(16.dp))
+                            Text("Converting Prices to PKR...", color = Color.White)
+                        }
+                    }
+                }
+
+                currencyNodes.forEach { node ->
+                    val chipX = (node.bounds.centerX() / bitmapWidth) * screenWidth.value
+                    val chipY = (node.bounds.centerY() / bitmapHeight) * screenHeight.value
+
+                    Surface(
+                        modifier = Modifier
+                            .offset(x = (chipX.dp - (node.convertedText.length * 4).dp).coerceAtLeast(0.dp), y = chipY.dp - 12.dp)
+                            .clickable {
+                                // Copy to clipboard on tap
+                                val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Converted Price", node.convertedText))
+                                android.widget.Toast.makeText(context, "Copied to clipboard", android.widget.Toast.LENGTH_SHORT).show()
+                            },
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFF43A047).copy(alpha = 0.95f),
+                        tonalElevation = 4.dp,
+                        shadowElevation = 4.dp
+                    ) {
+                        Text(
+                            text = node.convertedText,
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 }
 }
+
+// --- Currency Models ---
+data class CurrencyNode(
+    val originalText: String,
+    val convertedText: String,
+    val bounds: android.graphics.Rect
+)
 
 // --- Phase 44: Smart Entity Extractor Models ---
 sealed class SmartEntity(val text: String, val bounds: android.graphics.RectF, val typeName: String, val icon: androidx.compose.ui.graphics.vector.ImageVector, val sourceColor: Color) {
