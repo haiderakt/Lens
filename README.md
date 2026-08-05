@@ -87,12 +87,16 @@ Think of it as having Google Lens, Bing Visual Search, Yandex, and TinEye all in
 
 ## 📥 **Get Circle To Search**
 
-This fork is not published on the Play Store or F-Droid. To use it, build it from source:
+### 📦 Download APK Releases
+You can download the latest pre-compiled APK packages directly from **[GitHub Releases](https://github.com/haiderakt/Lens/releases)**.
+
+### 🛠️ Build from Source
+Alternatively, you can build the application locally:
 
 ```bash
 git clone https://github.com/haiderakt/Lens.git
 cd Lens
-./gradlew assembleDebug
+./gradlew assembleRelease
 ```
 
 If you're looking for the original, officially published app, get it here instead:
